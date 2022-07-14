@@ -1,0 +1,7 @@
+1. Right now the data for the posts is coming from a json file. What changes would you have to make to the application if it came from an API? In what type of hook should you use to fetch the data and why? What other considerations would you have to make?
+
+  If the data for the posts came from an API, I would have to fetch the data in a useEffect() hook in the BlogList component and then set it to a state variable. Ideally this state would be handled globally with some sort of context provider like the useContext() hook or some state management library like Redux. I'd also consider using Axios for the API requests, or an ORM tool like Sequelize to avoid having to write my endpoints using PostgreSQL.
+
+2. Part of this application uses the package nanoid to generate keys. What issue would this cause for generating keys in React?
+
+  React is designed to render all used components at least once, and then re-render the component only when something changes in that component, or if you tell it to re-render, like in a useEffect() hook. This way, your application doesn't need to constantly do server calls to retrieve data that isn't actually changing and performance is greatly improved. This is why React is so powerful and commonly used. Using nanoid for key props would make React components re-render when they don't actually need to, since their state wouldn't be changing, but their keys would. Instead, I would just use the index of map() as the key instead of nanoid.

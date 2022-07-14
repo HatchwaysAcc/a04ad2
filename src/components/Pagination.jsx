@@ -4,7 +4,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/outline";
 import usePagination, { DOTS } from "../hooks/usePagination";
 
 import PropTypes from "prop-types";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { nanoid } from "nanoid";
 
 function Pagination({
@@ -14,12 +14,17 @@ function Pagination({
   currentPage,
   pageSize,
   pageSizeOptions,
+  maxPageNumber,
 }) {
   const paginationRange = usePagination({
     currentPage,
     totalCount,
     pageSize,
+    maxPageNumber,
   });
+
+  const [disableLeft, setDisableLeft] = useState(false);
+  const [disableRight, setDisableRight] = useState(false);
 
   const onNext = () => {
     onPageChange(currentPage + 1);
@@ -28,6 +33,28 @@ function Pagination({
   const onPrevious = () => {
     onPageChange(currentPage - 1);
   };
+
+  useEffect(() => {
+    // check to see whether to disable left or right arrow buttons on component render
+    if (currentPage >= maxPageNumber) {
+      setDisableRight(true);
+      onPageChange(maxPageNumber);
+    } else {
+      setDisableRight(false);
+    };
+
+    if (currentPage === 1) {
+      setDisableLeft(true);
+    } else {
+      setDisableLeft(false);
+    };
+
+    if (maxPageNumber === 1) {
+      setDisableLeft(true);
+      setDisableRight(true);
+    };
+
+  },[currentPage, onPageSizeOptionChange])
 
   return (
     <ul
@@ -42,7 +69,7 @@ function Pagination({
           // Do not remove the aria-label below, it is used for Hatchways automation.
           aria-label="Goto previous page"
           onClick={onPrevious}
-          disabled={false} // change this line to disable a button.
+          disabled={disableLeft} // change this line to disable a button.
         >
           <ChevronLeftIcon />
         </button>
@@ -50,6 +77,12 @@ function Pagination({
 
       {paginationRange.map((pageNumber) => {
         const key = nanoid();
+
+        // highlight the current page
+        let highlight = "false";
+        if (pageNumber === currentPage) {
+          highlight = "page";
+        }
 
         if (pageNumber === DOTS) {
           return (
@@ -63,7 +96,7 @@ function Pagination({
           <li
             key={key}
             className="paginationItem"
-            aria-current="false" // change this line to highlight a current page.
+            aria-current={highlight} // change this line to highlight a current page.
           >
             <button
               type="button"
@@ -84,7 +117,7 @@ function Pagination({
           // Do not remove the aria-label below, it is used for Hatchways automation.
           aria-label="Goto next page"
           onClick={onNext}
-          disabled={false} // change this line to disable a button.
+          disabled={disableRight} // change this line to disable a button.
         >
           <ChevronRightIcon />
         </button>
